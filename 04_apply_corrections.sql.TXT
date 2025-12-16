@@ -1,0 +1,68 @@
+-- ============================================
+-- Step 4: Apply City Name Corrections
+-- ============================================
+
+-- Purpose: Apply the corrections from city_corrections table to customers table
+
+-- IMPORTANT: Review corrections before running this script!
+-- Make sure customers_backup table exists before proceeding.
+
+-- Preview: Show what will change
+SELECT 
+    c.customer_city as current_city_name,
+    cc.correct_city as new_city_name,
+    COUNT(*) as number_of_records_to_update,
+    cc.similarity_score
+FROM customers c
+INNER JOIN city_corrections cc ON c.customer_city = cc.incorrect_city
+GROUP BY c.customer_city, cc.correct_city, cc.similarity_score
+ORDER BY number_of_records_to_update DESC;
+
+-- Get total impact summary before making changes
+SELECT 
+    COUNT(DISTINCT c.customer_city) as cities_to_be_corrected,
+    COUNT(*) as total_customer_records_affected
+FROM customers c
+INNER JOIN city_corrections cc ON c.customer_city = cc.incorrect_city;
+
+-- ============================================
+-- APPLY CORRECTIONS
+-- ============================================
+-- WARNING: This will modify the customers table
+-- Ensure backup exists before running!
+
+BEGIN;
+
+-- Update customers table with corrected city names
+UPDATE customers
+SET customer_city = cc.correct_city
+FROM city_corrections cc
+WHERE customers.customer_city = cc.incorrect_city;
+
+-- Show how many rows were affected
+-- (This will display after the UPDATE completes)
+
+COMMIT;
+
+-- Alternative: If you want to manually control the commit
+-- BEGIN;
+-- UPDATE customers...
+-- SELECT * FROM customers WHERE customer_city IN (SELECT correct_city FROM city_corrections) LIMIT 10;
+-- If everything looks good: COMMIT;
+-- If something is wrong: ROLLBACK;
+
+-- Verify the update was successful
+SELECT 
+    'Records updated' as status,
+    COUNT(*) as count
+FROM customers c
+INNER JOIN city_corrections cc ON c.customer_city = cc.correct_city;
+
+-- Show final city name distribution
+SELECT 
+    customer_city,
+    COUNT(*) as customer_count
+FROM customers
+GROUP BY customer_city
+ORDER BY customer_count DESC
+LIMIT 20;

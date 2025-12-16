@@ -1,0 +1,52 @@
+"incorrect_city","correct_city","incorrect_count","correct_count","similarity_score","reviewed","approved"
+"itapetinga","itapetininga","18","78","0.84615386",False,False
+"sao joao da barra","sao joaquim da barra","15","34","0.72727275",False,False
+"sao jose do vale do rio preto","sao jose do rio preto","12","335","0.8148148",False,False
+"charqueada","charqueadas","10","17","0.7692308",False,False
+"catanduvas","catanduva","6","75","0.75",False,False
+"sao jose da barra","sao joao da barra","6","15","0.75",False,False
+"santa barbara d oeste","santa barbara d'oeste","5","119","1",False,False
+"holambra ii","holambra","5","24","0.75",False,False
+"corumbaiba","corumba","4","28","0.72727275",False,False
+"pinheiro","pinheiros","4","9","0.72727275",False,False
+"santa mariana","santa maria","4","197","0.73333335",False,False
+"maravilhas","maravilha","4","12","0.75",False,False
+"fronteiras","fronteira","3","6","0.75",False,False
+"gameleiras","gameleira","3","4","0.75",False,False
+"madre de deus de minas","madre de deus","3","7","0.7058824",False,False
+"pedreiras","pedreira","3","36","0.72727275",False,False
+"florestal","floresta","3","11","0.72727275",False,False
+"alagoinha","alagoinhas","2","40","0.75",False,False
+"mogi-mirim","mogi mirim","2","76","1",False,False
+"palmeiras","palmeira","2","16","0.72727275",False,False
+"congonhinhas","congonhas","2","30","0.7692308",False,False
+"santa cruz de salinas","santa cruz de minas","2","5","0.73913044",False,False
+"araponga","arapongas","2","35","0.72727275",False,False
+"guarara","guara","2","10","0.85714287",False,False
+"maracana","maracanau","2","35","0.72727275",False,False
+"vitorino","vitorinos","1","1","0.72727275",False,False
+"vitorinos","vitorino","1","1","0.72727275",False,False
+"almirante tamandare do sul","almirante tamandare","1","35","0.7407407",False,False
+"anaurilandia","aurilandia","1","1","0.71428573",False,False
+"arraial d ajuda","arraial d'ajuda","1","8","1",False,False
+"aurilandia","anaurilandia","1","1","0.71428573",False,False
+"barreira","barreiras","1","52","0.72727275",False,False
+"capela do alto alegre","capela do alto","1","3","0.75",False,False
+"castanheiras","castanheira","1","3","0.78571427",False,False
+"cordeiros","cordeiro","1","24","0.72727275",False,False
+"correntes","corrente","1","4","0.72727275",False,False
+"dias d avila","dias d'avila","1","24","1",False,False
+"esmeralda","esmeraldas","1","14","0.75",False,False
+"estrela d'oeste","estrela d oeste","1","1","1",False,False
+"estrela d oeste","estrela d'oeste","1","1","1",False,False
+"montanhas","montanha","1","10","0.72727275",False,False
+"palmeira d oeste","palmeira d'oeste","1","5","1",False,False
+"santa barbara do para","santa barbara do sul","1","2","0.72727275",False,False
+"sao domingos do sul","sao domingos","1","7","0.7647059",False,False
+"sao jorge d'oeste","sao jorge do oeste","1","1","0.85",False,False
+"sao jorge do oeste","sao jorge d'oeste","1","1","0.85",False,False
+"sao jose da boa vista","sao joao da boa vista","1","82","0.7916667",False,False
+"sao jose do piaui","sao joao do piaui","1","6","0.75",False,False
+"sao sebastiao do paraiba","sao sebastiao do paraiso","1","36","0.7692308",False,False
+"serra dos dourados","serra dourada","1","2","0.7058824",False,False
+"teixeira","teixeiras","1","7","0.72727275",False,False

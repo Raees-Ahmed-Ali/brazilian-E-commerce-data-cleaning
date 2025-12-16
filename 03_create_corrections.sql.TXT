@@ -1,0 +1,80 @@
+-- ============================================
+-- Step 3: Create City Corrections Mapping Table
+-- ============================================
+
+-- Purpose: Create a mapping table that identifies incorrect spellings and their corrections
+
+-- Create the corrections mapping table
+CREATE TABLE city_corrections AS
+WITH city_counts AS (
+    -- Get count of each city name variant
+    SELECT 
+        customer_city,
+        COUNT(*) as record_count
+    FROM customers
+    GROUP BY customer_city
+),
+similar_groups AS (
+    -- Find similar city names and determine which is the "correct" version
+    -- We assume the most frequently occurring spelling is correct
+    SELECT DISTINCT ON (c1.customer_city)
+        c1.customer_city as incorrect_city,
+        c1.record_count as incorrect_count,
+        c2.customer_city as correct_city,
+        c2.record_count as correct_count,
+        SIMILARITY(c1.customer_city, c2.customer_city) as similarity_score
+    FROM city_counts c1
+    JOIN city_counts c2 
+        ON LEFT(c1.customer_city, 1) = LEFT(c2.customer_city, 1)  -- Performance optimization
+    WHERE c1.customer_city <> c2.customer_city  -- Don't compare city to itself
+      AND SIMILARITY(c1.customer_city, c2.customer_city) > 0.7  -- Similarity threshold
+      AND c2.record_count >= c1.record_count  -- Keep the more common spelling
+    ORDER BY 
+        c1.customer_city, 
+        c2.record_count DESC,  -- Prefer more common spellings
+        similarity_score DESC   -- Prefer higher similarity
+)
+SELECT 
+    incorrect_city,
+    correct_city,
+    incorrect_count,
+    correct_count,
+    similarity_score,
+    false as reviewed,  -- Flag for manual review
+    false as approved   -- Flag to approve correction
+FROM similar_groups;
+
+-- Add comments to the table
+COMMENT ON TABLE city_corrections IS 'Mapping of misspelled city names to their correct versions';
+COMMENT ON COLUMN city_corrections.incorrect_city IS 'The misspelled or variant city name';
+COMMENT ON COLUMN city_corrections.correct_city IS 'The correct city name (most common spelling)';
+COMMENT ON COLUMN city_corrections.similarity_score IS 'Trigram similarity score (0-1 scale)';
+
+-- View summary of corrections
+SELECT 
+    COUNT(*) as total_corrections,
+    SUM(incorrect_count) as total_records_affected,
+    ROUND(AVG(similarity_score), 3) as avg_similarity_score,
+    MIN(similarity_score) as min_similarity,
+    MAX(similarity_score) as max_similarity
+FROM city_corrections;
+
+-- View top corrections by impact
+SELECT 
+    incorrect_city,
+    correct_city,
+    incorrect_count as records_affected,
+    ROUND(similarity_score::numeric, 3) as similarity
+FROM city_corrections
+ORDER BY incorrect_count DESC
+LIMIT 20;
+
+-- Check for any low-confidence corrections that might need manual review
+SELECT 
+    incorrect_city,
+    correct_city,
+    incorrect_count,
+    similarity_score
+FROM city_corrections
+WHERE similarity_score < 0.75
+ORDER BY incorrect_count DESC;

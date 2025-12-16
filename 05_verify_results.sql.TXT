@@ -1,0 +1,96 @@
+-- ============================================
+-- Step 5: Verify Data Cleaning Results
+-- ============================================
+
+-- Purpose: Validate that data cleaning was successful and generate summary statistics
+
+-- Compare before and after cleaning
+SELECT 
+    'Before Cleaning' as status,
+    COUNT(DISTINCT customer_city) as distinct_cities,
+    COUNT(*) as total_records
+FROM customers_backup
+UNION ALL
+SELECT 
+    'After Cleaning' as status,
+    COUNT(DISTINCT customer_city) as distinct_cities,
+    COUNT(*) as total_records
+FROM customers;
+
+-- Calculate improvement
+WITH before_stats AS (
+    SELECT COUNT(DISTINCT customer_city) as cities_before
+    FROM customers_backup
+),
+after_stats AS (
+    SELECT COUNT(DISTINCT customer_city) as cities_after
+    FROM customers
+)
+SELECT 
+    cities_before,
+    cities_after,
+    cities_before - cities_after as cities_removed,
+    ROUND(((cities_before - cities_after)::numeric / cities_before * 100), 2) as percent_reduction
+FROM before_stats, after_stats;
+
+-- Show which corrections were applied
+SELECT 
+    cc.incorrect_city as original_spelling,
+    cc.correct_city as corrected_spelling,
+    cc.incorrect_count as records_corrected,
+    cc.similarity_score
+FROM city_corrections cc
+ORDER BY cc.incorrect_count DESC;
+
+-- Verify data integrity - check that no records were lost
+SELECT 
+    'Backup' as source,
+    COUNT(*) as record_count
+FROM customers_backup
+UNION ALL
+SELECT 
+    'Current' as source,
+    COUNT(*) as record_count
+FROM customers;
+
+-- Show top cities after cleaning
+SELECT 
+    customer_city,
+    COUNT(*) as customer_count,
+    ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER(), 2) as percentage
+FROM customers
+GROUP BY customer_city
+ORDER BY customer_count DESC
+LIMIT 20;
+
+-- Check for any remaining potential duplicates
+-- (Should return very few or zero results)
+WITH city_counts AS (
+    SELECT 
+        customer_city,
+        COUNT(*) as record_count,
+        LEFT(customer_city, 1) as first_letter
+    FROM customers
+    GROUP BY customer_city
+)
+SELECT 
+    c1.customer_city as city_1,
+    c2.customer_city as city_2,
+    c1.record_count as count_1,
+    c2.record_count as count_2,
+    SIMILARITY(c1.customer_city, c2.customer_city) as similarity_score
+FROM city_counts c1
+JOIN city_counts c2 ON c1.first_letter = c2.first_letter
+WHERE c1.customer_city < c2.customer_city
+  AND SIMILARITY(c1.customer_city, c2.customer_city) > 0.7
+ORDER BY similarity_score DESC
+LIMIT 10;
+
+-- Generate summary report
+SELECT 
+    'Data Cleaning Summary' as report_title,
+    (SELECT COUNT(*) FROM city_corrections) as total_corrections_made,
+    (SELECT SUM(incorrect_count) FROM city_corrections) as total_records_affected,
+    (SELECT COUNT(DISTINCT customer_city) FROM customers_backup) as cities_before,
+    (SELECT COUNT(DISTINCT customer_city) FROM customers) as cities_after,
+    CURRENT_TIMESTAMP as report_generated_at;

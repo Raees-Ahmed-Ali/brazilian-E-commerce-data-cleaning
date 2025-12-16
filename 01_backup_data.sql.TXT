@@ -1,0 +1,40 @@
+-- ============================================
+-- Step 1: Backup Original Data
+-- ============================================
+
+-- Purpose: Create backup of customers table before data cleaning operations
+
+-- Create complete backup of customers table
+CREATE TABLE customers_backup AS
+SELECT * FROM customers;
+
+-- Verify backup was created successfully
+SELECT 
+    'customers' as table_name,
+    COUNT(*) as record_count
+FROM customers
+UNION ALL
+SELECT 
+    'customers_backup' as table_name,
+    COUNT(*) as record_count
+FROM customers_backup;
+
+-- Optional: Create additional backup of just city names with timestamp
+CREATE TABLE city_name_backup AS
+SELECT 
+    customer_id,
+    customer_city as original_city_name,
+    CURRENT_TIMESTAMP as backup_date
+FROM customers;
+
+-- Verify city backup
+SELECT COUNT(*) as total_city_records FROM city_name_backup;
+
+-- Get initial statistics
+SELECT 
+    COUNT(*) as total_customers,
+    COUNT(DISTINCT customer_city) as distinct_cities
+FROM customers;
+
+COMMENT ON TABLE customers_backup IS 'Full backup of customers table created before data cleaning operations';
+COMMENT ON TABLE city_name_backup IS 'Backup of original city names with timestamp for audit trail';
